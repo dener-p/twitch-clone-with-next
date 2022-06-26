@@ -1,13 +1,17 @@
 import { Menu } from "@headlessui/react"
+import { signOut, useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
+import { ReactElement } from "react"
 import { BsPerson, BsSearch, BsThreeDotsVertical } from "react-icons/bs"
 import logo from "../public/assets/logo.png"
 
 export const Navbar = () => {
+  const { data: session } = useSession()
+
   return (
-    <div className="fixed h-14 justify-between w-full flex flex-nowrap items-center p-4 bg-[#0c0e10] mb-[2px] z-10 ">
-      <div className="flex  items-center justify-start ">
+    <div className="fixed top-0 h-14  justify-between w-full flex flex-nowrap items-center p-4  bg-[#0c0e10] mb-[2px] z-10 ">
+      <div className="flex  items-center justify-start   w-44 ">
         <Link href="/">
           <a className="flex">
             <Image src={logo} alt="logo" width={36} height={36} />
@@ -15,75 +19,137 @@ export const Navbar = () => {
         </Link>
         <p className="p-4">Browse</p>
         <div className="p-4">
-          <Menu as="div" className="relative text-left">
-            <Menu.Button className="flex">
-              <BsThreeDotsVertical />
-            </Menu.Button>
-            <Menu.Items className="origin-top z-10  absolute flex flex-col w-48 mt-1 bg-blackTwitch rounded gap-1">
+          <SubMenu
+            button={<BsThreeDotsVertical />}
+            items={[
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    className={`p-2 rounded ${active && "bg-slate-500 "}`}
-                    href="/account-settings"
+                    href="/"
+                    className={`${active && "bg-slate-500"} flex p-2`}
+                  >
+                    Home
+                  </a>
+                )}
+              </Menu.Item>,
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    href="/account"
+                    className={`${active && "bg-slate-500"} flex p-2`}
                   >
                     Account
                   </a>
                 )}
-              </Menu.Item>
+              </Menu.Item>,
               <Menu.Item>
                 {({ active }) => (
                   <a
-                    className={`p-2 rounded  ${active && "bg-slate-500"}`}
-                    href="/account-settings"
+                    href="/"
+                    className={`${active && "bg-slate-500"} flex p-2`}
                   >
                     Documentation
                   </a>
                 )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={`p-2 rounded ${active && "bg-slate-500"}`}
-                    href="/account-settings"
-                  >
-                    Documentation
-                  </a>
-                )}
-              </Menu.Item>
-            </Menu.Items>
-          </Menu>
+              </Menu.Item>,
+            ]}
+            diretion="left-0"
+          />
         </div>
       </div>
       <div
-        className="flex items-center justify-items-center bg-blackTwitch transition-all w-[2.5rem] group left-[12rem]   focus-within:w-[calc(50vw+2.5rem)] h-10  absolute  overflow-hidden 
-      md:w-[400px] md:focus-within:w-[400px] md:static md:mx-auto
-      "
+        className="absolute left-48 -translate-x-1/2 flex h-14  transition-all group gap-1 items-center overflow-hidden w-6 focus-within:w-full bg-blackTwitch focus-within:p-4 
+      focus-within:left-1/2 md:left-1/2 hover:text-purpleTwitch md:w-80 md:focus-within:w-80 md:p-4 md:hover:text-white"
       >
         <input
           type="text"
-          className="absolute peer transition-opacity opacity-0 p-2 rounded-l bg-zinc-600
-          focus:outline outline-purpleTwitch outline-1 outline-offset-1 my-auto  h-4/5 focus:opacity-100 cursor-pointer left-0 w-[calc(50vw-2px)] ml-1 placeholder:text-white/80 md:opacity-100 
-          md:w-full md:static "
+          aria-label="search"
+          className=" w-full md:cursor-text opacity-0 outline-none focus:outline-1 h-7 rounded-l px-2 bg-zinc-500 focus:outline-purpleTwitch transition-[width] text-white  group-focus-within:w-full group-focus-within:opacity-100 cursor-pointer group-focus-within:cursor-text 
+          md:opacity-100 md:w-full placeholder:text-zinc-200"
           placeholder="Search"
         />
-        <BsSearch
-          size={32}
-          className="cursor-pointer  rounded-r  p-2  ml-auto md:bg-zinc-600   md:ml-1  
-        group-hover:text-purpleTwitch peer-focus:text-white hover:peer-focus:text-purpleTwitch 
-          md:group-hover:text-white
-        "
-        />
+        <button
+          className=" w-6 grid place-content-center -ml-6 pointer-events-none outline-none group-focus-within:text-white group-focus-within:ml-auto z-10 h-7  md:bg-zinc-500 p-2 group-focus-within:pointer-events-auto group-focus-within:hover:text-purpleTwitch 
+        group-focus-within:bg-zinc-500 group-focus-within:rounded-r focus:outline-purpleTwitch md:ml-0
+        md:rounded-r disabled:cursor-not-allowed md:pointer-events-auto md:disabled:hover:text-white disabled:group-focus-within:hover:text-white hover:text-purpleTwitch "
+          disabled
+        >
+          <BsSearch className="" />
+        </button>
       </div>
       <div className=" flex items-center justify-end w-40  ">
-        <div className="flex items-center">
-          <Link href={"/"}>
-            <button className="px-4 py-[6px] rounded-lg font-bold bg-purpleTwitch ">
-              Account
-            </button>
-          </Link>
-          <BsPerson size={30} />
-        </div>
+        {!session && (
+          <div className="flex items-center">
+            <Link href={"/account"} className="cursor-pointer">
+              <button className="px-4 py-[6px] rounded-lg font-bold bg-purpleTwitch ">
+                Account
+              </button>
+            </Link>
+            <BsPerson size={30} />
+          </div>
+        )}
+        {session && (
+          <div>
+            <SubMenu
+              button={
+                session.user?.image ? (
+                  <Image
+                    width={30}
+                    height={30}
+                    src={session.user?.image}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <BsThreeDotsVertical />
+                )
+              }
+              items={[
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      href="/account"
+                      className={`${active && "bg-slate-500"} flex p-2`}
+                    >
+                      Account
+                    </a>
+                  )}
+                </Menu.Item>,
+                <Menu.Item>
+                  {({ active }) => (
+                    <p
+                      className={`${
+                        active && "bg-slate-500"
+                      } flex p-2 cursor-pointer`}
+                      onClick={() => signOut()}
+                    >
+                      Sign Out
+                    </p>
+                  )}
+                </Menu.Item>,
+              ]}
+            />
+          </div>
+        )}
       </div>
     </div>
+  )
+}
+
+interface SubMenuProps {
+  items?: ReactElement[]
+  diretion?: string
+  button: ReactElement
+}
+
+const SubMenu = ({ items, diretion = "right-0", button }: SubMenuProps) => {
+  return (
+    <Menu as="div" className="relative text-left ">
+      <Menu.Button className="flex  ">{button}</Menu.Button>
+      <Menu.Items
+        className={`${diretion} origin-top z-10  absolute flex flex-col w-48 mt-1 bg-blackTwitch rounded gap-1`}
+      >
+        {items?.map((i) => i)}
+      </Menu.Items>
+    </Menu>
   )
 }
