@@ -19,9 +19,8 @@ export const Navbar = () => {
         </Link>
         <p className="p-4">Browse</p>
         <div className="p-4">
-          <SubMenu
-            button={<BsThreeDotsVertical />}
-            items={[
+          <SubMenu button={<BsThreeDotsVertical />} diretion="left-0">
+            <>
               <Menu.Item>
                 {({ active }) => (
                   <a
@@ -31,7 +30,7 @@ export const Navbar = () => {
                     Home
                   </a>
                 )}
-              </Menu.Item>,
+              </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
                   <a
@@ -41,7 +40,7 @@ export const Navbar = () => {
                     Account
                   </a>
                 )}
-              </Menu.Item>,
+              </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
                   <a
@@ -51,10 +50,9 @@ export const Navbar = () => {
                     Documentation
                   </a>
                 )}
-              </Menu.Item>,
-            ]}
-            diretion="left-0"
-          />
+              </Menu.Item>
+            </>
+          </SubMenu>
         </div>
       </div>
       <div
@@ -103,7 +101,8 @@ export const Navbar = () => {
                   <BsThreeDotsVertical />
                 )
               }
-              items={[
+            >
+              <>
                 <Menu.Item>
                   {({ active }) => (
                     <a
@@ -113,7 +112,7 @@ export const Navbar = () => {
                       Account
                     </a>
                   )}
-                </Menu.Item>,
+                </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
                     <p
@@ -125,9 +124,9 @@ export const Navbar = () => {
                       Sign Out
                     </p>
                   )}
-                </Menu.Item>,
-              ]}
-            />
+                </Menu.Item>
+              </>
+            </SubMenu>
           </div>
         )}
       </div>
@@ -136,19 +135,19 @@ export const Navbar = () => {
 }
 
 interface SubMenuProps {
-  items?: ReactElement[]
+  children?: ReactElement
   diretion?: string
   button: ReactElement
 }
 
-const SubMenu = ({ items, diretion = "right-0", button }: SubMenuProps) => {
+const SubMenu = ({ children, diretion = "right-0", button }: SubMenuProps) => {
   return (
     <Menu as="div" className="relative text-left ">
       <Menu.Button className="flex  ">{button}</Menu.Button>
       <Menu.Items
         className={`${diretion} origin-top z-10  absolute flex flex-col w-48 mt-1 bg-blackTwitch rounded gap-1`}
       >
-        {items?.map((i) => i)}
+        {children}
       </Menu.Items>
     </Menu>
   )
